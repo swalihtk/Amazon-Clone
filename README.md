@@ -20,6 +20,7 @@ export const useStateValue=()=> {
 ```
 
 ### Creating Reducer
+```javascript
 export const initialState = {
   basket: []
 };
