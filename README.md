@@ -1,70 +1,75 @@
-# Getting Started with Create React App
+# Amazon Clone React
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## React Context Api
 
-## Available Scripts
+### Creating StateContext
 
-In the project directory, you can run:
+```javascript
+import React, { createContext, useContext, useReducer} from 'react';
 
-### `npm start`
+export const StateContext=createContext();
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+export const StateProvider=({reducer, initialState, children})=>(
+    <StateContext.Provider value={useReducer(reducer, initialState)}>
+        {children}
+    </StateContext.Provider>
+)
+export const useStateValue=()=> {
+    return useContext(StateContext)
+}
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Creating Reducer
+export const initialState = {
+  basket: []
+};
 
-### `npm test`
+export const getTotalBasketPrice=(basket)=> basket?.reduce((amount, item)=> item.price+amount, 0);
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+function reducer(state, action) {
+    console.log(action)
+  switch (action.type) {
+    case "ADD_TO_BASKET":
+      // logic for add
+        return {
+            ...state,
+            basket:[...state.basket, action.item]
+        }
+          break;
+      case "REMOVE_FROM_BASKET":
+      // logic for remove
+        let newBasket=[...state.basket];
+        let index=state.basket.findIndex(item=> item.id==action.id);
+        if(index>=0){
+            newBasket.splice(index, 1);
+        }else{
+            console.warn(`can't remove the product (id: ${action.id}) from the basket`);
+        }
+        return {...state,
+            basket: newBasket
+        };
+          break
+    default:
+      return state;
+  }
+}
 
-### `npm run build`
+export default reducer;
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Using StateProvider in Index.js
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```javascript
+import { StateProvider } from "./StateProvider";
+import reducer, { initialState } from "./reducer";
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+rectDom.render(
+  <React.StrictMode>
+    <StateProvider initialState={initialState} reducer={reducer}>
+      <App />
+    </StateProvider>
+  </React.StrictMode>,
+  document.getElementById("root")
+);
+```
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
